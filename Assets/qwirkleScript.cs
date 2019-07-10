@@ -20,6 +20,8 @@ public class qwirkleScript : MonoBehaviour
 	Tile[][] board;
 	Tile[] sideboard;
 	int selected = 0;
+	int stage = 0;
+	bool row6 = false;
 
 	public GameObject[] tiles;
 	public GameObject[] available;
@@ -32,6 +34,55 @@ public class qwirkleScript : MonoBehaviour
 	void Awake()
 	{
 		moduleId = moduleIdCounter++;
+		tiles[0].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(0); return false; };
+		tiles[1].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(1); return false; };
+		tiles[2].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(2); return false; };
+		tiles[3].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(3); return false; };
+		tiles[4].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(4); return false; };
+		tiles[5].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(5); return false; };
+		tiles[6].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(6); return false; };
+		tiles[7].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(7); return false; };
+		tiles[8].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(8); return false; };
+		tiles[9].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(9); return false; };
+		tiles[10].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(10); return false; };
+		tiles[11].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(11); return false; };
+		tiles[12].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(12); return false; };
+		tiles[13].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(13); return false; };
+		tiles[14].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(14); return false; };
+		tiles[15].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(15); return false; };
+		tiles[16].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(16); return false; };
+		tiles[17].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(17); return false; };
+		tiles[18].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(18); return false; };
+		tiles[19].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(19); return false; };
+		tiles[20].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(20); return false; };
+		tiles[21].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(21); return false; };
+		tiles[22].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(22); return false; };
+		tiles[23].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(23); return false; };
+		tiles[24].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(24); return false; };
+		tiles[25].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(25); return false; };
+		tiles[26].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(26); return false; };
+		tiles[27].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(27); return false; };
+		tiles[28].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(28); return false; };
+		tiles[29].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(29); return false; };
+		tiles[30].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(30); return false; };
+		tiles[31].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(31); return false; };
+		tiles[32].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(32); return false; };
+		tiles[33].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(33); return false; };
+		tiles[34].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(34); return false; };
+		tiles[35].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(35); return false; };
+		tiles[36].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(36); return false; };
+		tiles[37].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(37); return false; };
+		tiles[38].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(38); return false; };
+		tiles[39].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(39); return false; };
+		tiles[40].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(40); return false; };
+		tiles[41].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(41); return false; };
+		tiles[42].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(42); return false; };
+		tiles[43].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(43); return false; };
+		tiles[44].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(44); return false; };
+		tiles[45].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(45); return false; };
+		tiles[46].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(46); return false; };
+		tiles[47].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(47); return false; };
+		tiles[48].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(48); return false; };
 		sideBtns[0].OnInteract += delegate () { PressSide(0); return false; };
 		sideBtns[1].OnInteract += delegate () { PressSide(1); return false; };
 		sideBtns[2].OnInteract += delegate () { PressSide(2); return false; };
@@ -45,6 +96,42 @@ public class qwirkleScript : MonoBehaviour
 		available[selected].transform.Find("selected").GetComponentInChildren<Renderer>().material = greenMat;
 	}
 
+	void PressGrid(int btn)
+	{
+		int row = btn / 7;
+		int column = btn % 7;
+
+		if(!board[row][column].IsEmpty())
+		{
+      		Debug.LogFormat("[Qwirkle #{0}] Strike! Tried to place a tile at {1}{2}, which isn't empty.", moduleId, (char)(column + 65), row + 1);
+            GetComponent<KMBombModule>().HandleStrike();
+			GenerateBoard();
+			GenerateAvailableTiles();
+			stage = 0;
+			return;
+		}
+
+		if(!CheckValidTile(row, column))
+		{
+      		Debug.LogFormat("[Qwirkle #{0}] Strike! Tried to place a tile at {1}{2}, which has no adjacent tiles.", moduleId, (char)(column + 65), row + 1);
+            GetComponent<KMBombModule>().HandleStrike();
+			GenerateBoard();
+			GenerateAvailableTiles();
+			stage = 0;
+			return;
+		}
+
+		if(!CheckConnectors(row, column, sideboard[selected].color, sideboard[selected].shape))
+		{
+			Debug.LogFormat("[Qwirkle #{0}] Strike! Tried to place {1} {2} tile at {3}{4}, which violates placement rules.", moduleId, sideboard[selected].GetColorName(), sideboard[selected].GetShapeName(), (char)(column + 65), row + 1);
+            GetComponent<KMBombModule>().HandleStrike();
+			GenerateBoard();
+			GenerateAvailableTiles();
+			stage = 0;
+			return;
+		}
+	}
+
 	void Start () 
 	{
 		GenerateBoard();
@@ -53,6 +140,9 @@ public class qwirkleScript : MonoBehaviour
 
 	void GenerateBoard()
 	{
+		foreach(GameObject tile in tiles)
+			tile.transform.GetComponentInChildren<Renderer>().material = emptyMat;
+
 		board = new Tile[][] { 
 								new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty) },
 								new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty) },
@@ -106,6 +196,8 @@ public class qwirkleScript : MonoBehaviour
 			board[row][column] = new Tile(Tile.empty);
 			tiles[order.ElementAt(i)].transform.GetComponentInChildren<Renderer>().material = emptyMat;
 		}
+
+		CheckRow6();
 	}
 
 	bool CheckValidTile(int row, int column)
@@ -346,6 +438,29 @@ public class qwirkleScript : MonoBehaviour
 		{
 			sideboard[i] = stack.ElementAt(i);
 			available[i].transform.GetComponentInChildren<Renderer>().material = tileMats[sideboard[i].color * 6 + sideboard[i].shape];
+		}
+	}
+
+	void CheckRow6()
+	{
+		for(int i = 0; i < 7; i++)
+		{
+			int accHor = 0;
+			int accVer = 0;
+			for(int j = 0; j < 7; j++)
+			{
+				if(board[i][j].IsEmpty()) accHor = 0;
+				else accHor++;
+				if(board[j][i].IsEmpty()) accVer = 0;
+				else accVer++;
+
+				if(accHor == 6 || accVer == 6)
+				{
+					row6 = true;
+					Debug.Log("YES");
+					return;
+				}
+			}
 		}
 	}
 }

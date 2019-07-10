@@ -797,6 +797,16 @@ Prefab:
       propertyPath: greenMat
       value: 
       objectReference: {fileID: 2100000, guid: f63b14f9afd9b8c4bbe0f615ad5f23cd, type: 2}
+    - target: {fileID: 114682943674607128, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
+        type: 2}
+      propertyPath: ModuleType
+      value: qwirkle
+      objectReference: {fileID: 0}
+    - target: {fileID: 114682943674607128, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
+        type: 2}
+      propertyPath: ModuleDisplayName
+      value: Qwirkle
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 52a5b78c9e78e1f40b89b848dc2909cb, type: 2}
   m_IsPrefabParent: 0
