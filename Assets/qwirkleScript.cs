@@ -18,18 +18,37 @@ public class qwirkleScript : MonoBehaviour
     private bool moduleSolved;
 
 	Tile[][] board;
+	Tile[] sideboard;
+	int selected = 0;
+
 	public GameObject[] tiles;
+	public GameObject[] available;
 	public Material[] tileMats;
+	public Material emptyMat;
+	public Material blackMat;
+	public Material greenMat;
+	public KMSelectable[] sideBtns;
 
 	void Awake()
 	{
 		moduleId = moduleIdCounter++;
-		//btn.OnInteract += delegate () { PressButton(); return false; };
+		sideBtns[0].OnInteract += delegate () { PressSide(0); return false; };
+		sideBtns[1].OnInteract += delegate () { PressSide(1); return false; };
+		sideBtns[2].OnInteract += delegate () { PressSide(2); return false; };
+		sideBtns[3].OnInteract += delegate () { PressSide(3); return false; };
+	}
+
+	void PressSide(int btn)
+	{
+		available[selected].transform.Find("selected").GetComponentInChildren<Renderer>().material = blackMat;
+		selected = btn;
+		available[selected].transform.Find("selected").GetComponentInChildren<Renderer>().material = greenMat;
 	}
 
 	void Start () 
 	{
 		GenerateBoard();
+		GenerateAvailableTiles();
 	}
 
 	void GenerateBoard()
@@ -69,7 +88,7 @@ public class qwirkleScript : MonoBehaviour
 
 			firstTile = false;
 
-			List<Tile> possibilities = GetPossibilities(row, column);
+			List<Tile> possibilities = GetPossibilities(row, column, true);
 
 			if(possibilities.Count() != 0)
 			{
@@ -78,6 +97,14 @@ public class qwirkleScript : MonoBehaviour
 				tiles[priority.ElementAt(0)].transform.GetComponentInChildren<Renderer>().material = tileMats[board[row][column].color * 6 + board[row][column].shape];
 			}
 			priority.RemoveAt(0);
+		}
+
+		for(int i = order.Count() - 7; i < order.Count; i++)
+		{
+			int row = order[i] / 7;
+			int column = order[i] % 7;
+			board[row][column] = new Tile(Tile.empty);
+			tiles[order.ElementAt(i)].transform.GetComponentInChildren<Renderer>().material = emptyMat;
 		}
 	}
 
@@ -98,12 +125,9 @@ public class qwirkleScript : MonoBehaviour
 		return false;
 	}
 
-	List<Tile> GetPossibilities(int row, int column)
+	List<Tile> GetPossibilities(int row, int column, bool boring)
 	{
 		List<Tile> ret = new List<Tile>(); 
-
-		if(IncompatibleTile(row, column))
-			return ret;
 
 		bool[][] down = GetColumnPossibilities(row, column, true);
 		bool[][] up = GetColumnPossibilities(row, column, false);
@@ -112,13 +136,13 @@ public class qwirkleScript : MonoBehaviour
 
 		for(int i = 0; i < 6; i++)
 			for(int j = 0; j < 6; j++)
-				if(down[i][j] && up[i][j] && right[i][j] && left[i][j])
+				if(down[i][j] && up[i][j] && right[i][j] && left[i][j] && (!boring || !BoringBoard(row, column)) && CheckConnectors(row, column, i, j))
 					ret.Add(new Tile(i, j));
 
 		return ret;
 	}
 
-	bool IncompatibleTile(int row, int column)
+	bool BoringBoard(int row, int column)
 	{
 		List<Tile> adj = new List<Tile>();
 
@@ -135,6 +159,93 @@ public class qwirkleScript : MonoBehaviour
 			return true;
 
 		return false;
+	}
+
+	bool CheckConnectors(int row, int column, int color, int shape)
+	{
+		List<int> connectColor = new List<int>();
+		List<int> connectShape = new List<int>();
+
+		for(int i = 0; i < 7; i++)
+		{
+			int nextColor, nextShape;
+
+			if(row == i)
+			{
+				nextColor = color;
+				nextShape = shape;
+			}
+			else
+			{
+				if(board[i][column].IsEmpty())
+				{
+					connectColor = new List<int>();
+					connectShape = new List<int>();
+					continue;
+				}
+
+				nextColor = board[i][column].color;
+				nextShape = board[i][column].shape;
+			}
+
+			if(connectColor.Count() == 0 && connectShape.Count() == 0)
+			{
+				connectColor.Add(nextColor);
+				connectShape.Add(nextShape);
+				continue;
+			}
+
+			if(connectColor.Exists(x => x == nextColor) && connectShape.Exists(x => x == nextShape))
+				return false;
+			else if(!connectColor.All(x => x == nextColor) && !connectShape.All(x => x == nextShape))
+				return false;
+
+			connectColor.Add(nextColor);
+			connectShape.Add(nextShape);
+		}
+
+		connectColor = new List<int>();
+		connectShape = new List<int>();
+
+		for(int i = 0; i < 7; i++)
+		{
+			int nextColor, nextShape;
+
+			if(column == i)
+			{
+				nextColor = color;
+				nextShape = shape;
+			}
+			else
+			{
+				if(board[row][i].IsEmpty())
+				{
+					connectColor = new List<int>();
+					connectShape = new List<int>();
+					continue;
+				}
+
+				nextColor = board[row][i].color;
+				nextShape = board[row][i].shape;
+			}
+
+			if(connectColor.Count() == 0 && connectShape.Count() == 0)
+			{
+				connectColor.Add(nextColor);
+				connectShape.Add(nextShape);
+				continue;
+			}
+
+			if(connectColor.Exists(x => x == nextColor) && connectShape.Exists(x => x == nextShape))
+				return false;
+			else if(!connectColor.All(x => x == nextColor) && !connectShape.All(x => x == nextShape))
+				return false;
+
+			connectColor.Add(nextColor);
+			connectShape.Add(nextShape);
+		}
+
+		return true;
 	}
 
 	bool[][] GetColumnPossibilities(int row, int column, bool direction)
@@ -185,5 +296,56 @@ public class qwirkleScript : MonoBehaviour
 		}
 
 		return ret;
+	}
+
+	void GenerateAvailableTiles()
+	{
+		sideboard = new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty)};
+		List<int> priority = Enumerable.Range(0, 48).ToList().OrderBy(x => rnd.Next()).ToList();
+		List<Tile> stack = new List<Tile>();
+		
+		while(stack.Count() != 1)
+		{
+			int row = priority[0] / 7;
+			int column = priority[0] % 7;
+
+			if(!board[row][column].IsEmpty())
+			{
+				priority.RemoveAt(0);
+				continue;
+			}
+
+			List<Tile> possibilities = GetPossibilities(row, column, false).OrderBy(x => rnd.Next()).ToList();
+
+			if(possibilities.Count() == 0)
+			{
+				priority.RemoveAt(0);
+				continue;
+			}
+
+			stack.Add(possibilities.ElementAt(0));
+		}
+
+		List<int> colors = Enumerable.Range(0, 5).ToList().OrderBy(x => rnd.Next()).ToList();
+		List<int> shapes = Enumerable.Range(0, 5).ToList().OrderBy(x => rnd.Next()).ToList();
+
+		int colorIndex = 0;
+		int shapeIndex = 0;
+
+		while(stack.Count() != 4)
+		{
+			while(stack.Exists(x => x.color == colors.ElementAt(colorIndex))) colorIndex++;
+			while(stack.Exists(x => x.shape == shapes.ElementAt(shapeIndex))) shapeIndex++;
+
+			stack.Add(new Tile(colors.ElementAt(colorIndex), shapes.ElementAt(shapeIndex)));
+		}
+
+		stack = stack.OrderBy(x => rnd.Next()).ToList();
+
+		for(int i = 0; i < stack.Count(); i++)
+		{
+			sideboard[i] = stack.ElementAt(i);
+			available[i].transform.GetComponentInChildren<Renderer>().material = tileMats[sideboard[i].color * 6 + sideboard[i].shape];
+		}
 	}
 }
