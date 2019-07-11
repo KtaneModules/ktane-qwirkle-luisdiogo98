@@ -230,6 +230,8 @@ public class qwirkleScript : MonoBehaviour
 				board = newBoard;
 			}
 		}
+
+		Debug.LogFormat("[Qwirkle #{0}] Stage {1} board is: {2}", moduleId, stage + 1, GetBoardString());
 	}
 
 	void Restart()
@@ -308,6 +310,8 @@ public class qwirkleScript : MonoBehaviour
 		}
 
 		CheckRow6();
+
+		Debug.LogFormat("[Qwirkle #{0}] Stage 1 board is: {1}", moduleId, GetBoardString());
 	}
 
 	bool CheckValidTile(int row, int column)
@@ -505,13 +509,17 @@ public class qwirkleScript : MonoBehaviour
 		sideboard = new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty)};
 		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Next()).ToList();
 		List<Tile> stack = new List<Tile>();
+
+		Tile valid = new Tile(Tile.empty);
+		int valid_row = -1;
+		int valid_column = -1;
 		
 		while(stack.Count() != 1)
 		{
 			int row = priority[0] / 7;
 			int column = priority[0] % 7;
 
-			if(!board[row][column].IsEmpty())
+			if(!board[row][column].IsEmpty() || !CheckValidTile(row, column))
 			{
 				priority.RemoveAt(0);
 				continue;
@@ -526,6 +534,9 @@ public class qwirkleScript : MonoBehaviour
 			}
 
 			stack.Add(possibilities.ElementAt(0));
+			valid = possibilities.ElementAt(0);
+			valid_row = row;
+			valid_column = column;
 		}
 
 		List<int> colors = Enumerable.Range(0, 6).ToList().OrderBy(x => rnd.Next()).ToList();
@@ -549,6 +560,8 @@ public class qwirkleScript : MonoBehaviour
 			sideboard[i] = stack.ElementAt(i);
 			available[i].transform.GetComponentInChildren<Renderer>().material = tileMats[sideboard[i].color * 6 + sideboard[i].shape];
 		}
+
+		Debug.LogFormat("[Qwirkle #{0}] Available pieces for stage {1} are {2}. Piece {3}_{4} is guaranteed valid for {5}{6}.", moduleId, stage + 1, GetAvailableString(), valid.GetColorName(), valid.GetShapeName(), (char)(valid_column + 65), valid_row	 + 1);
 	}
 
 	void CheckRow6()
@@ -571,6 +584,37 @@ public class qwirkleScript : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	String GetBoardString()
+	{
+		String ret = "";
+
+		for(int i = 0; i < 7; i++)
+			for(int j = 0; j < 7; j++)
+			{
+				if(board[i][j].IsEmpty())
+					ret += "empty ";
+				else
+					ret += board[i][j].GetColorName() + "_" + board[i][j].GetShapeName() + " ";
+			}
+
+		return ret;
+	}
+
+	String GetAvailableString()
+	{
+		String ret = "";
+
+		foreach(Tile tile in sideboard)
+		{
+			if(tile.IsEmpty())
+				ret += "empty ";
+			else
+				ret += tile.GetColorName() + "_" + tile.GetShapeName() + " ";
+		}
+
+		return ret;
 	}
 
 	IEnumerator HideBoard()
