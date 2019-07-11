@@ -144,6 +144,7 @@ public class qwirkleScript : MonoBehaviour
 
 		if(stage == 4)
 		{
+			Debug.LogFormat("[Qwirkle #{0}] Module solved.", moduleId);
 			Audio.PlaySoundAtTransform("solve", transform);
             moduleSolved = true;
 			GetComponent<KMBombModule>().HandlePass();
@@ -213,7 +214,7 @@ public class qwirkleScript : MonoBehaviour
 				(placed.ElementAt(1).color == placed.ElementAt(2).color && placed.ElementAt(1).color != placed.ElementAt(0).color) ||
 				(placed.ElementAt(0).color == placed.ElementAt(2).color && placed.ElementAt(0).color != placed.ElementAt(1).color))
 			{
-				Debug.LogFormat("[Qwirkle #{0}] Exactly two of the previous three tiles placed were the same color. Rotate 90° CW.", moduleId);
+				Debug.LogFormat("[Qwirkle #{0}] Exactly two of the previous three tiles placed were the same color. Rotating 90° CW.", moduleId);
 				for(int i = 0; i < 7; i++)
 					for(int j = 0; j < 7; j++)
 						newBoard[j][6 - i] = board[i][j];
@@ -222,7 +223,7 @@ public class qwirkleScript : MonoBehaviour
 			}
 			else
 			{
-				Debug.LogFormat("[Qwirkle #{0}] Not exactly two of the previous three tiles placed were the same color. Rotate 90° CCW.", moduleId);
+				Debug.LogFormat("[Qwirkle #{0}] Not exactly two of the previous three tiles placed were the same color. Rotating 90° CCW.", moduleId);
 				for(int i = 0; i < 7; i++)
 					for(int j = 0; j < 7; j++)
 						newBoard[6 - j][i] = board[i][j];
@@ -231,17 +232,17 @@ public class qwirkleScript : MonoBehaviour
 			}
 		}
 
-		Debug.LogFormat("[Qwirkle #{0}] Stage {1} board is: {2}", moduleId, stage + 1, GetBoardString());
+		Debug.LogFormat("[Qwirkle #{0}] Stage {1} board: {2}", moduleId, stage + 1, GetBoardString());
 	}
 
 	void Restart()
 	{
-		GenerateBoard();
-		GenerateAvailableTiles();
 		stage = 0;
 		foreach(GameObject stage in stageObj)
 			stage.transform.GetComponentInChildren<Renderer>().material = blackMat;
 		placed = new List<Tile>();
+		GenerateBoard();
+		GenerateAvailableTiles();
 	}
 
 	void Start () 
@@ -311,7 +312,7 @@ public class qwirkleScript : MonoBehaviour
 
 		CheckRow6();
 
-		Debug.LogFormat("[Qwirkle #{0}] Stage 1 board is: {1}", moduleId, GetBoardString());
+		Debug.LogFormat("[Qwirkle #{0}] Stage 1 board: {1}", moduleId, GetBoardString());
 	}
 
 	bool CheckValidTile(int row, int column)
