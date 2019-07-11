@@ -561,7 +561,7 @@ public class qwirkleScript : MonoBehaviour
 			available[i].transform.GetComponentInChildren<Renderer>().material = tileMats[sideboard[i].color * 6 + sideboard[i].shape];
 		}
 
-		Debug.LogFormat("[Qwirkle #{0}] Available pieces for stage {1} are {2}. Piece {3}_{4} is guaranteed valid for {5}{6}.", moduleId, stage + 1, GetAvailableString(), valid.GetColorName(), valid.GetShapeName(), (char)(valid_column + 65), valid_row	 + 1);
+		Debug.LogFormat("[Qwirkle #{0}] Available pieces for stage {1} are {2}. {3}_{4} is guaranteed valid for {5}{6}.", moduleId, stage + 1, GetAvailableString(), valid.GetColorName(), valid.GetShapeName(), (char)(valid_column + 65), valid_row	 + 1);
 	}
 
 	void CheckRow6()
