@@ -238,6 +238,7 @@ public class qwirkleScript : MonoBehaviour
 	void Restart()
 	{
 		stage = 0;
+		row6 = false;
 		foreach(GameObject stage in stageObj)
 			stage.transform.GetComponentInChildren<Renderer>().material = blackMat;
 		placed = new List<Tile>();
