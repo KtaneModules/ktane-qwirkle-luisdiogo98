@@ -93,6 +93,7 @@ public class qwirkleScript : MonoBehaviour
 
 	void PressSide(int btn)
 	{
+		Audio.PlaySoundAtTransform("select", transform);
 		available[selected].transform.Find("selected").GetComponentInChildren<Renderer>().material = blackMat;
 		selected = btn;
 		available[selected].transform.Find("selected").GetComponentInChildren<Renderer>().material = greenMat;
@@ -138,17 +139,19 @@ public class qwirkleScript : MonoBehaviour
 
 		if(stage == 1)
 		{
-			// StartCoroutine("HideBoard");
+			StartCoroutine("HideBoard");
 		}
 
 		if(stage == 4)
 		{
+			Audio.PlaySoundAtTransform("solve", transform);
             moduleSolved = true;
 			GetComponent<KMBombModule>().HandlePass();
 			StartCoroutine("ShowBoard");
 		}
 		else
 		{
+			Audio.PlaySoundAtTransform("placement", transform);
 			ApplyStageEffects();
 			GenerateAvailableTiles();
 		}
@@ -206,9 +209,9 @@ public class qwirkleScript : MonoBehaviour
 		}
 		else if (stage == 3)
 		{
-			if( (placed.ElementAt(0).color == placed.ElementAt(1).color && placed.ElementAt(0) != placed.ElementAt(2)) ||
-				(placed.ElementAt(1).color == placed.ElementAt(2).color && placed.ElementAt(1) != placed.ElementAt(0)) ||
-				(placed.ElementAt(0).color == placed.ElementAt(2).color && placed.ElementAt(0) != placed.ElementAt(1)))
+			if( (placed.ElementAt(0).color == placed.ElementAt(1).color && placed.ElementAt(0).color != placed.ElementAt(2).color) ||
+				(placed.ElementAt(1).color == placed.ElementAt(2).color && placed.ElementAt(1).color != placed.ElementAt(0).color) ||
+				(placed.ElementAt(0).color == placed.ElementAt(2).color && placed.ElementAt(0).color != placed.ElementAt(1).color))
 			{
 				Debug.LogFormat("[Qwirkle #{0}] Exactly two of the previous three tiles placed were the same color. Rotate 90° CW.", moduleId);
 				for(int i = 0; i < 7; i++)
@@ -525,8 +528,8 @@ public class qwirkleScript : MonoBehaviour
 			stack.Add(possibilities.ElementAt(0));
 		}
 
-		List<int> colors = Enumerable.Range(0, 5).ToList().OrderBy(x => rnd.Next()).ToList();
-		List<int> shapes = Enumerable.Range(0, 5).ToList().OrderBy(x => rnd.Next()).ToList();
+		List<int> colors = Enumerable.Range(0, 6).ToList().OrderBy(x => rnd.Next()).ToList();
+		List<int> shapes = Enumerable.Range(0, 6).ToList().OrderBy(x => rnd.Next()).ToList();
 
 		int colorIndex = 0;
 		int shapeIndex = 0;
