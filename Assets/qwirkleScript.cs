@@ -19,6 +19,7 @@ public class qwirkleScript : MonoBehaviour
 
 	Tile[][] board;
 	Tile[] sideboard;
+	List<Tile> placed = new List<Tile>();
 	int selected = 0;
 	int stage = 0;
 	bool row6 = false;
@@ -130,13 +131,14 @@ public class qwirkleScript : MonoBehaviour
 		}
 
 		board[row][column] = sideboard[selected];
+		placed.Add(sideboard[selected]);
 		stageObj[stage].GetComponentInChildren<Renderer>().material = greenMat;
 		stage++;
 		Debug.LogFormat("[Qwirkle #{0}] Successfully placed {1}_{2} at {3}{4}.", moduleId, sideboard[selected].GetColorName(), sideboard[selected].GetShapeName(), (char)(column + 65), row + 1);
 
 		if(stage == 1)
 		{
-			StartCoroutine("HideBoard");
+			// StartCoroutine("HideBoard");
 		}
 
 		if(stage == 4)
@@ -147,8 +149,83 @@ public class qwirkleScript : MonoBehaviour
 		}
 		else
 		{
-			// ApplyStageEffects();
+			ApplyStageEffects();
 			GenerateAvailableTiles();
+		}
+
+	}
+
+	void ApplyStageEffects()
+	{
+		Tile[][] newBoard = new Tile[][] { 
+								new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty) },
+								new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty) },
+								new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty) },
+								new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty) },
+								new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty) },
+								new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty) },
+								new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty) }
+							 };
+
+		if(stage == 1)
+		{
+			if(row6)
+			{
+				Debug.LogFormat("[Qwirkle #{0}] Initial board had line of 6 tiles. Rotating 180º.", moduleId);
+				for(int i = 0; i < 7; i++)
+					for(int j = 0; j < 7; j++)
+						newBoard[6 - i][6 - j] = board[i][j];
+
+				board = newBoard;
+			}
+			else
+			{
+				Debug.LogFormat("[Qwirkle #{0}] Initial board did not have a line of 6 tiles. No effect.", moduleId);
+			}
+		}
+		else if(stage == 2)
+		{
+			if(placed.ElementAt(1).shape == Tile.star4 || placed.ElementAt(1).shape == Tile.star8 || placed.ElementAt(1).shape == Tile.cross)
+			{
+				Debug.LogFormat("[Qwirkle #{0}] Previously placed tile was not a square, diamond, or circle. Mirroring about the X-axis.", moduleId);
+				for(int i = 0; i < 7; i++)
+					for(int j = 0; j < 7; j++)
+						newBoard[6 - i][j] = board[i][j];
+
+				board = newBoard;
+			}
+			else
+			{
+				Debug.LogFormat("[Qwirkle #{0}] Previously placed tile was a square, diamond, or circle. Mirroring about the Y-axis.", moduleId);
+				for(int i = 0; i < 7; i++)
+					for(int j = 0; j < 7; j++)
+						newBoard[i][6 - j] = board[i][j];
+
+				board = newBoard;
+			}
+		}
+		else if (stage == 3)
+		{
+			if( (placed.ElementAt(0).color == placed.ElementAt(1).color && placed.ElementAt(0) != placed.ElementAt(2)) ||
+				(placed.ElementAt(1).color == placed.ElementAt(2).color && placed.ElementAt(1) != placed.ElementAt(0)) ||
+				(placed.ElementAt(0).color == placed.ElementAt(2).color && placed.ElementAt(0) != placed.ElementAt(1)))
+			{
+				Debug.LogFormat("[Qwirkle #{0}] Exactly two of the previous three tiles placed were the same color. Rotate 90° CW.", moduleId);
+				for(int i = 0; i < 7; i++)
+					for(int j = 0; j < 7; j++)
+						newBoard[j][6 - i] = board[i][j];
+
+				board = newBoard;
+			}
+			else
+			{
+				Debug.LogFormat("[Qwirkle #{0}] Not exactly two of the previous three tiles placed were the same color. Rotate 90° CCW.", moduleId);
+				for(int i = 0; i < 7; i++)
+					for(int j = 0; j < 7; j++)
+						newBoard[6 - j][i] = board[i][j];
+
+				board = newBoard;
+			}
 		}
 	}
 
@@ -159,6 +236,7 @@ public class qwirkleScript : MonoBehaviour
 		stage = 0;
 		foreach(GameObject stage in stageObj)
 			stage.transform.GetComponentInChildren<Renderer>().material = blackMat;
+		placed = new List<Tile>();
 	}
 
 	void Start () 
