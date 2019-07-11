@@ -25,6 +25,7 @@ public class qwirkleScript : MonoBehaviour
 
 	public GameObject[] tiles;
 	public GameObject[] available;
+	public GameObject[] stageObj;
 	public Material[] tileMats;
 	public Material emptyMat;
 	public Material blackMat;
@@ -98,6 +99,9 @@ public class qwirkleScript : MonoBehaviour
 
 	void PressGrid(int btn)
 	{
+		if(moduleSolved)
+			return;
+
 		int row = btn / 7;
 		int column = btn % 7;
 
@@ -105,9 +109,7 @@ public class qwirkleScript : MonoBehaviour
 		{
       		Debug.LogFormat("[Qwirkle #{0}] Strike! Tried to place a tile at {1}{2}, which isn't empty.", moduleId, (char)(column + 65), row + 1);
             GetComponent<KMBombModule>().HandleStrike();
-			GenerateBoard();
-			GenerateAvailableTiles();
-			stage = 0;
+			Restart();
 			return;
 		}
 
@@ -115,21 +117,48 @@ public class qwirkleScript : MonoBehaviour
 		{
       		Debug.LogFormat("[Qwirkle #{0}] Strike! Tried to place a tile at {1}{2}, which has no adjacent tiles.", moduleId, (char)(column + 65), row + 1);
             GetComponent<KMBombModule>().HandleStrike();
-			GenerateBoard();
-			GenerateAvailableTiles();
-			stage = 0;
+			Restart();
 			return;
 		}
 
 		if(!CheckConnectors(row, column, sideboard[selected].color, sideboard[selected].shape))
 		{
-			Debug.LogFormat("[Qwirkle #{0}] Strike! Tried to place {1} {2} tile at {3}{4}, which violates placement rules.", moduleId, sideboard[selected].GetColorName(), sideboard[selected].GetShapeName(), (char)(column + 65), row + 1);
+			Debug.LogFormat("[Qwirkle #{0}] Strike! Tried to place {1}_{2} at {3}{4}, which violates placement rules.", moduleId, sideboard[selected].GetColorName(), sideboard[selected].GetShapeName(), (char)(column + 65), row + 1);
             GetComponent<KMBombModule>().HandleStrike();
-			GenerateBoard();
-			GenerateAvailableTiles();
-			stage = 0;
+			Restart();
 			return;
 		}
+
+		board[row][column] = sideboard[selected];
+		stageObj[stage].GetComponentInChildren<Renderer>().material = greenMat;
+		stage++;
+		Debug.LogFormat("[Qwirkle #{0}] Successfully placed {1}_{2} at {3}{4}.", moduleId, sideboard[selected].GetColorName(), sideboard[selected].GetShapeName(), (char)(column + 65), row + 1);
+
+		if(stage == 1)
+		{
+			StartCoroutine("HideBoard");
+		}
+
+		if(stage == 4)
+		{
+            moduleSolved = true;
+			GetComponent<KMBombModule>().HandlePass();
+			StartCoroutine("ShowBoard");
+		}
+		else
+		{
+			// ApplyStageEffects();
+			GenerateAvailableTiles();
+		}
+	}
+
+	void Restart()
+	{
+		GenerateBoard();
+		GenerateAvailableTiles();
+		stage = 0;
+		foreach(GameObject stage in stageObj)
+			stage.transform.GetComponentInChildren<Renderer>().material = blackMat;
 	}
 
 	void Start () 
@@ -153,7 +182,7 @@ public class qwirkleScript : MonoBehaviour
 								new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty) }
 							 };
 
-		List<int> priority = Enumerable.Range(0, 48).ToList().OrderBy(x => rnd.Next()).ToList();
+		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Next()).ToList();
 		List<int> order = new List<int>();
 		bool firstTile = true;		
 
@@ -393,7 +422,7 @@ public class qwirkleScript : MonoBehaviour
 	void GenerateAvailableTiles()
 	{
 		sideboard = new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty)};
-		List<int> priority = Enumerable.Range(0, 48).ToList().OrderBy(x => rnd.Next()).ToList();
+		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Next()).ToList();
 		List<Tile> stack = new List<Tile>();
 		
 		while(stack.Count() != 1)
@@ -457,10 +486,37 @@ public class qwirkleScript : MonoBehaviour
 				if(accHor == 6 || accVer == 6)
 				{
 					row6 = true;
-					Debug.Log("YES");
 					return;
 				}
 			}
+		}
+	}
+
+	IEnumerator HideBoard()
+	{
+		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Next()).ToList();
+		foreach(int tile in priority)
+		{
+			tiles[tile].transform.GetComponentInChildren<Renderer>().material = blackMat;
+			yield return new WaitForSeconds(0.01f);
+		}
+	}
+
+	IEnumerator ShowBoard()
+	{
+		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Next()).ToList();
+		foreach(int tile in priority)
+		{
+			int row = tile / 7;
+			int column = tile % 7;
+
+			if(board[row][column].IsEmpty())
+			{
+				tiles[tile].transform.GetComponentInChildren<Renderer>().material = emptyMat;
+				continue;
+			}
+			tiles[tile].transform.GetComponentInChildren<Renderer>().material = tileMats[board[row][column].color * 6 + board[row][column].shape];
+			yield return new WaitForSeconds(0.01f);
 		}
 	}
 }

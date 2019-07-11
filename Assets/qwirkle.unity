@@ -110,6 +110,11 @@ NavMeshSettings:
     tileSize: 256
     accuratePlacement: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &7635237 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1794800198102834, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
+    type: 2}
+  m_PrefabInternal: {fileID: 221982058}
 --- !u!1 &33031633 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1715463332173976, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
@@ -156,6 +161,11 @@ GameObject:
   m_PrefabParentObject: {fileID: 1154374358520896, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
     type: 2}
   m_PrefabInternal: {fileID: 221982058}
+--- !u!1 &205348470 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1039700458486822, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
+    type: 2}
+  m_PrefabInternal: {fileID: 221982058}
 --- !u!1001 &221982058
 Prefab:
   m_ObjectHideFlags: 0
@@ -176,6 +186,11 @@ Prefab:
     - target: {fileID: 114189083327926310, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
         type: 2}
       propertyPath: sideBtns.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114189083327926310, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
+        type: 2}
+      propertyPath: stageObj.Array.size
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 114189083327926310, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
@@ -807,6 +822,26 @@ Prefab:
       propertyPath: ModuleDisplayName
       value: Qwirkle
       objectReference: {fileID: 0}
+    - target: {fileID: 114189083327926310, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
+        type: 2}
+      propertyPath: stageObj.Array.data[0]
+      value: 
+      objectReference: {fileID: 1875090611}
+    - target: {fileID: 114189083327926310, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
+        type: 2}
+      propertyPath: stageObj.Array.data[1]
+      value: 
+      objectReference: {fileID: 7635237}
+    - target: {fileID: 114189083327926310, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
+        type: 2}
+      propertyPath: stageObj.Array.data[2]
+      value: 
+      objectReference: {fileID: 205348470}
+    - target: {fileID: 114189083327926310, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
+        type: 2}
+      propertyPath: stageObj.Array.data[3]
+      value: 
+      objectReference: {fileID: 783302775}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 52a5b78c9e78e1f40b89b848dc2909cb, type: 2}
   m_IsPrefabParent: 0
@@ -1035,6 +1070,11 @@ GameObject:
   m_PrefabParentObject: {fileID: 1747460780053030, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
     type: 2}
   m_PrefabInternal: {fileID: 221982058}
+--- !u!1 &783302775 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1683212253171926, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
+    type: 2}
+  m_PrefabInternal: {fileID: 221982058}
 --- !u!1 &854315368 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1281993745057696, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
@@ -1186,6 +1226,11 @@ GameObject:
 --- !u!1 &1873725967 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1863749528749680, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
+    type: 2}
+  m_PrefabInternal: {fileID: 221982058}
+--- !u!1 &1875090611 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1040893899700840, guid: 52a5b78c9e78e1f40b89b848dc2909cb,
     type: 2}
   m_PrefabInternal: {fileID: 221982058}
 --- !u!1 &1891583839 stripped

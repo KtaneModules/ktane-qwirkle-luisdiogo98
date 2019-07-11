@@ -40,13 +40,12 @@ class Tile
     {
         switch(color)
         {
-            case -1: return "Empty";
-            case 0: return "Green";
-            case 1: return "Blue";
-            case 2: return "Purple";
-            case 3: return "Orange";
-            case 4: return "Yellow";
-            case 5: return "Red";
+            case 0: return "green";
+            case 1: return "blue";
+            case 2: return "purple";
+            case 3: return "orange";
+            case 4: return "yellow";
+            case 5: return "red";
         }
 
         return "";
@@ -56,13 +55,12 @@ class Tile
     {
         switch(shape)
         {
-            case -1: return "Empty";
-            case 0: return "4-pointed Star";
-            case 1: return "8-pointed Star";
-            case 2: return "Circle";
-            case 3: return "Cross";
-            case 4: return "Diamond";
-            case 5: return "Square";
+            case 0: return "4star";
+            case 1: return "8star";
+            case 2: return "circle";
+            case 3: return "cross";
+            case 4: return "diamond";
+            case 5: return "square";
         }
 
         return "";
