@@ -4,13 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using KModkit;
+using rnd = UnityEngine.Random;
 
 public class qwirkleScript : MonoBehaviour 
 {
 	public KMBombInfo bomb;
 	public KMAudio Audio;
-
-    static System.Random rnd = new System.Random();
 
 	//Logging
 	static int moduleIdCounter = 1;
@@ -267,7 +266,7 @@ public class qwirkleScript : MonoBehaviour
 								new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty) }
 							 };
 
-		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Next()).ToList();
+		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Range(0, 1000)).ToList();
 		List<int> order = new List<int>();
 		bool firstTile = true;		
 
@@ -296,7 +295,7 @@ public class qwirkleScript : MonoBehaviour
 
 			if(possibilities.Count() != 0)
 			{
-				board[row][column] = possibilities.OrderBy(x => rnd.Next()).ElementAt(0);
+				board[row][column] = possibilities.OrderBy(x => rnd.Range(0, 1000)).ElementAt(0);
 				order.Add(priority.ElementAt(0));
 				tiles[priority.ElementAt(0)].transform.GetComponentInChildren<Renderer>().material = tileMats[board[row][column].color * 6 + board[row][column].shape];
 			}
@@ -509,7 +508,7 @@ public class qwirkleScript : MonoBehaviour
 	void GenerateAvailableTiles()
 	{
 		sideboard = new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty)};
-		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Next()).ToList();
+		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Range(0, 1000)).ToList();
 		List<Tile> stack = new List<Tile>();
 
 		Tile valid = new Tile(Tile.empty);
@@ -527,7 +526,7 @@ public class qwirkleScript : MonoBehaviour
 				continue;
 			}
 
-			List<Tile> possibilities = GetPossibilities(row, column, false).OrderBy(x => rnd.Next()).ToList();
+			List<Tile> possibilities = GetPossibilities(row, column, false).OrderBy(x => rnd.Range(0, 1000)).ToList();
 
 			if(possibilities.Count() == 0)
 			{
@@ -541,8 +540,8 @@ public class qwirkleScript : MonoBehaviour
 			valid_column = column;
 		}
 
-		List<int> colors = Enumerable.Range(0, 6).ToList().OrderBy(x => rnd.Next()).ToList();
-		List<int> shapes = Enumerable.Range(0, 6).ToList().OrderBy(x => rnd.Next()).ToList();
+		List<int> colors = Enumerable.Range(0, 6).ToList().OrderBy(x => rnd.Range(0, 1000)).ToList();
+		List<int> shapes = Enumerable.Range(0, 6).ToList().OrderBy(x => rnd.Range(0, 1000)).ToList();
 
 		int colorIndex = 0;
 		int shapeIndex = 0;
@@ -555,7 +554,7 @@ public class qwirkleScript : MonoBehaviour
 			stack.Add(new Tile(colors.ElementAt(colorIndex), shapes.ElementAt(shapeIndex)));
 		}
 
-		stack = stack.OrderBy(x => rnd.Next()).ToList();
+		stack = stack.OrderBy(x => rnd.Range(0, 1000)).ToList();
 
 		for(int i = 0; i < stack.Count(); i++)
 		{
@@ -621,7 +620,7 @@ public class qwirkleScript : MonoBehaviour
 
 	IEnumerator HideBoard()
 	{
-		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Next()).ToList();
+		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Range(0, 1000)).ToList();
 		foreach(int tile in priority)
 		{
 			tiles[tile].transform.GetComponentInChildren<Renderer>().material = blackMat;
@@ -631,7 +630,7 @@ public class qwirkleScript : MonoBehaviour
 
 	IEnumerator ShowBoard()
 	{
-		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Next()).ToList();
+		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Range(0, 1000)).ToList();
 		foreach(int tile in priority)
 		{
 			int row = tile / 7;
