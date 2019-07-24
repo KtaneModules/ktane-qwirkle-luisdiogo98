@@ -17,15 +17,16 @@ public class qwirkleScript : MonoBehaviour
     private bool moduleSolved;
 
 	Tile[][] board;
-	Tile[] sideboard;
 	List<Tile> placed = new List<Tile>();
-	int selected = 0;
 	int stage = 0;
 	bool row6 = false;
 
+	int selectedColor = 0;
+	int selectedShape = 0;
+
 	public GameObject[] tiles;
-	public GameObject[] available;
 	public GameObject[] stageObj;
+	public GameObject selected;
 	public Material[] tileMats;
 	public Material emptyMat;
 	public Material blackMat;
@@ -84,18 +85,23 @@ public class qwirkleScript : MonoBehaviour
 		tiles[46].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(46); return false; };
 		tiles[47].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(47); return false; };
 		tiles[48].GetComponentInChildren<KMSelectable>().OnInteract += delegate () { PressGrid(48); return false; };
-		sideBtns[0].OnInteract += delegate () { PressSide(0); return false; };
-		sideBtns[1].OnInteract += delegate () { PressSide(1); return false; };
-		sideBtns[2].OnInteract += delegate () { PressSide(2); return false; };
-		sideBtns[3].OnInteract += delegate () { PressSide(3); return false; };
+		sideBtns[0].OnInteract += delegate () { PressSide(0, -1); return false; };
+		sideBtns[1].OnInteract += delegate () { PressSide(0, 1); return false; };
+		sideBtns[2].OnInteract += delegate () { PressSide(-1, 0); return false; };
+		sideBtns[3].OnInteract += delegate () { PressSide(1, 0); return false; };
 	}
 
-	void PressSide(int btn)
+	void PressSide(int colorDelta, int shapeDelta)
 	{
 		Audio.PlaySoundAtTransform("select", transform);
-		available[selected].transform.Find("selected").GetComponentInChildren<Renderer>().material = blackMat;
-		selected = btn;
-		available[selected].transform.Find("selected").GetComponentInChildren<Renderer>().material = greenMat;
+		selectedColor += colorDelta;
+		selectedShape += shapeDelta;
+		if(selectedColor > 5) selectedColor = 0;
+		if(selectedColor < 0) selectedColor = 5;
+		if(selectedShape > 5) selectedShape = 0;
+		if(selectedShape < 0) selectedShape = 5;
+
+		selected.GetComponentInChildren<Renderer>().material = tileMats[selectedColor * 6 + selectedShape];
 	}
 
 	void PressGrid(int btn)
@@ -122,19 +128,19 @@ public class qwirkleScript : MonoBehaviour
 			return;
 		}
 
-		if(!CheckConnectors(row, column, sideboard[selected].color, sideboard[selected].shape))
+		if(!CheckConnectors(row, column, selectedColor, selectedShape))
 		{
-			Debug.LogFormat("[Qwirkle #{0}] Strike! Tried to place {1}_{2} at {3}{4}, which violates placement rules.", moduleId, sideboard[selected].GetColorName(), sideboard[selected].GetShapeName(), (char)(column + 65), row + 1);
+			Debug.LogFormat("[Qwirkle #{0}] Strike! Tried to place {1}_{2} at {3}{4}, which violates placement rules.", moduleId, new Tile(selectedColor, selectedShape).GetColorName(), new Tile(selectedColor, selectedShape).GetShapeName(), (char)(column + 65), row + 1);
             GetComponent<KMBombModule>().HandleStrike();
 			Restart();
 			return;
 		}
 
-		board[row][column] = sideboard[selected];
-		placed.Add(sideboard[selected]);
+		board[row][column] = new Tile(selectedColor, selectedShape);
+		placed.Add(board[row][column]);
 		stageObj[stage].GetComponentInChildren<Renderer>().material = greenMat;
 		stage++;
-		Debug.LogFormat("[Qwirkle #{0}] Successfully placed {1}_{2} at {3}{4}.", moduleId, sideboard[selected].GetColorName(), sideboard[selected].GetShapeName(), (char)(column + 65), row + 1);
+		Debug.LogFormat("[Qwirkle #{0}] Successfully placed {1}_{2} at {3}{4}.", moduleId, board[row][column].GetColorName(), board[row][column].GetShapeName(), (char)(column + 65), row + 1);
 
 		if(stage == 1)
 		{
@@ -153,7 +159,6 @@ public class qwirkleScript : MonoBehaviour
 		{
 			Audio.PlaySoundAtTransform("placement", transform);
 			ApplyStageEffects();
-			GenerateAvailableTiles();
 		}
 
 	}
@@ -242,13 +247,11 @@ public class qwirkleScript : MonoBehaviour
 			stage.transform.GetComponentInChildren<Renderer>().material = blackMat;
 		placed = new List<Tile>();
 		GenerateBoard();
-		GenerateAvailableTiles();
 	}
 
 	void Start () 
 	{
 		GenerateBoard();
-		GenerateAvailableTiles();
 	}
 
 	void GenerateBoard()
@@ -505,66 +508,6 @@ public class qwirkleScript : MonoBehaviour
 		return ret;
 	}
 
-	void GenerateAvailableTiles()
-	{
-		sideboard = new Tile[] { new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty), new Tile(Tile.empty)};
-		List<int> priority = Enumerable.Range(0, 49).ToList().OrderBy(x => rnd.Range(0, 1000)).ToList();
-		List<Tile> stack = new List<Tile>();
-
-		Tile valid = new Tile(Tile.empty);
-		int valid_row = -1;
-		int valid_column = -1;
-		
-		while(stack.Count() != 1)
-		{
-			int row = priority[0] / 7;
-			int column = priority[0] % 7;
-
-			if(!board[row][column].IsEmpty() || !CheckValidTile(row, column))
-			{
-				priority.RemoveAt(0);
-				continue;
-			}
-
-			List<Tile> possibilities = GetPossibilities(row, column, false).OrderBy(x => rnd.Range(0, 1000)).ToList();
-
-			if(possibilities.Count() == 0)
-			{
-				priority.RemoveAt(0);
-				continue;
-			}
-
-			stack.Add(possibilities.ElementAt(0));
-			valid = possibilities.ElementAt(0);
-			valid_row = row;
-			valid_column = column;
-		}
-
-		List<int> colors = Enumerable.Range(0, 6).ToList().OrderBy(x => rnd.Range(0, 1000)).ToList();
-		List<int> shapes = Enumerable.Range(0, 6).ToList().OrderBy(x => rnd.Range(0, 1000)).ToList();
-
-		int colorIndex = 0;
-		int shapeIndex = 0;
-
-		while(stack.Count() != 4)
-		{
-			while(stack.Exists(x => x.color == colors.ElementAt(colorIndex))) colorIndex++;
-			while(stack.Exists(x => x.shape == shapes.ElementAt(shapeIndex))) shapeIndex++;
-
-			stack.Add(new Tile(colors.ElementAt(colorIndex), shapes.ElementAt(shapeIndex)));
-		}
-
-		stack = stack.OrderBy(x => rnd.Range(0, 1000)).ToList();
-
-		for(int i = 0; i < stack.Count(); i++)
-		{
-			sideboard[i] = stack.ElementAt(i);
-			available[i].transform.GetComponentInChildren<Renderer>().material = tileMats[sideboard[i].color * 6 + sideboard[i].shape];
-		}
-
-		Debug.LogFormat("[Qwirkle #{0}] Available pieces for stage {1} are {2}. {3}_{4} is guaranteed valid for {5}{6}.", moduleId, stage + 1, GetAvailableString(), valid.GetColorName(), valid.GetShapeName(), (char)(valid_column + 65), valid_row	 + 1);
-	}
-
 	void CheckRow6()
 	{
 		for(int i = 0; i < 7; i++)
@@ -599,21 +542,6 @@ public class qwirkleScript : MonoBehaviour
 				else
 					ret += board[i][j].GetColorName() + "_" + board[i][j].GetShapeName() + " ";
 			}
-
-		return ret;
-	}
-
-	String GetAvailableString()
-	{
-		String ret = "";
-
-		foreach(Tile tile in sideboard)
-		{
-			if(tile.IsEmpty())
-				ret += "empty ";
-			else
-				ret += tile.GetColorName() + "_" + tile.GetShapeName() + " ";
-		}
 
 		return ret;
 	}
