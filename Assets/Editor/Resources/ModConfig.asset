@@ -20,6 +20,6 @@ MonoBehaviour:
     Repository: https://github.com/luisdiogo98/ktane-qwirkle\n\r\nAny problems/suggestions,
     feel free to contact me on the KTaNE Discord @TheThirdMan. Join the KTaNE Discord
     here: https://discord.gg/Fv7YEDj\r\n"
-  version: 2.1
+  version: 2.2
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 045641de1c6f011479092a5740b7eaad, type: 3}
